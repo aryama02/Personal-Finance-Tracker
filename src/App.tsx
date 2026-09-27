@@ -33,11 +33,36 @@ function hoursFor(shift: Shift) {
   if (typeof shift.hours === 'number') return shift.hours
   if (typeof shift.hoursInput === 'string') return Number(shift.hoursInput) || 0
   if (!shift.start || !shift.end) return 0
-  const [startHour, startMinute] = shift.start.split(':').map(Number)
-  const [endHour, endMinute] = shift.end.split(':').map(Number)
-  let minutes = endHour * 60 + endMinute - (startHour * 60 + startMinute)
+  const startMinutes = parseTimeMinutes(shift.start)
+  const endMinutes = parseTimeMinutes(shift.end)
+  if (startMinutes === null || endMinutes === null) return 0
+  let minutes = endMinutes - startMinutes
   if (minutes < 0) minutes += 1440
   return minutes / 60
+}
+
+function parseTimeMinutes(value: string) {
+  const match = value.trim().match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/i)
+  if (!match) return null
+  let hour = Number(match[1])
+  const minute = Number(match[2] ?? 0)
+  const meridiem = match[3]?.toUpperCase()
+  if (minute > 59) return null
+  if (meridiem) {
+    if (hour < 1 || hour > 12) return null
+    if (hour === 12) hour = 0
+    if (meridiem === 'PM') hour += 12
+  } else if (hour > 23) return null
+  return hour * 60 + minute
+}
+
+function formatTime(value: string) {
+  const minutes = parseTimeMinutes(value)
+  if (minutes === null) return value
+  const hour24 = Math.floor(minutes / 60)
+  const hour12 = hour24 % 12 || 12
+  const meridiem = hour24 >= 12 ? 'PM' : 'AM'
+  return `${hour12}:${String(minutes % 60).padStart(2, '0')} ${meridiem}`
 }
 function blankData(): TrackerData {
   return { wage: 0, targetStartDate: '', targetDate: '', weekStartDay: 5, resetTime: '00:00', activeWeek: makeWeek(getPeriodStart(), 5), archivedWeeks: [] }
@@ -120,7 +145,7 @@ function App() {
         <div className="page-heading"><div><p className="eyebrow accent-text">ACTIVE PERIOD</p><h2>Keep the week moving.</h2><p className="muted">Log your hours as you go. Your earnings update automatically.</p></div><button className="secondary-button" onClick={archiveCurrentWeek}>Archive week</button></div>
         <div className="summary-strip"><div><span className="summary-label">Current period</span><strong>{data.activeWeek.label}</strong></div><div><span className="summary-label">Hours logged</span><strong>{activeHours.toFixed(2)} <small>/ 40 hrs</small></strong></div><div><span className="summary-label">Estimated pay</span><strong>{money.format(activeHours * data.wage)}</strong></div><div><label className="summary-label" htmlFor="wage-input">Hourly wage</label><input id="wage-input" className="summary-input" type="number" min="0" step="0.25" value={data.wage || ''} placeholder="0.00" onChange={(event) => setData((current) => ({ ...current, wage: Number(event.target.value) }))} /></div></div>
         <div className="section-title"><div><h3>Daily shifts</h3><p className="muted">{data.activeWeek.shifts[0].day} through {data.activeWeek.shifts[6].day}</p></div><span className="live-badge"><i /> Live</span></div>
-        <div className="shift-table"><div className="table-head"><span>Day</span><span>Start time</span><span>End time</span><span>Hours</span><span>Est. earnings</span></div>{data.activeWeek.shifts.map((shift, index) => <div className="table-row" key={shift.date}><div className="day-cell"><strong>{shift.day}</strong><span>{dateFormat.format(new Date(`${shift.date}T12:00:00`))}</span></div><input aria-label={`${shift.day} start time`} type="time" value={shift.start} onClick={(event) => event.currentTarget.showPicker?.()} onChange={(event) => updateActiveShift(index, 'start', event.target.value)} /><input aria-label={`${shift.day} end time`} type="time" value={shift.end} onClick={(event) => event.currentTarget.showPicker?.()} onChange={(event) => updateActiveShift(index, 'end', event.target.value)} /><input aria-label={`${shift.day} hours`} className="hours-input" type="number" min="0" max="24" step="0.25" placeholder="0.00" value={typeof shift.hours === 'number' ? shift.hours : hoursFor(shift) || ''} onFocus={(event) => event.currentTarget.select()} onChange={(event) => updateActiveHours(index, event.target.value)} /><span className="earnings-cell">{money.format(hoursFor(shift) * data.wage)}</span></div>)}</div>
+        <div className="shift-table"><div className="table-head"><span>Day</span><span>Start time</span><span>End time</span><span>Hours</span><span>Est. earnings</span></div>{data.activeWeek.shifts.map((shift, index) => <div className="table-row" key={shift.date}><div className="day-cell"><strong>{shift.day}</strong><span>{dateFormat.format(new Date(`${shift.date}T12:00:00`))}</span></div><input aria-label={`${shift.day} start time`} type="text" inputMode="text" placeholder="9:00 AM" value={shift.start} onChange={(event) => updateActiveShift(index, 'start', event.target.value)} onBlur={(event) => updateActiveShift(index, 'start', formatTime(event.target.value))} /><input aria-label={`${shift.day} end time`} type="text" inputMode="text" placeholder="5:00 PM" value={shift.end} onChange={(event) => updateActiveShift(index, 'end', event.target.value)} onBlur={(event) => updateActiveShift(index, 'end', formatTime(event.target.value))} /><input aria-label={`${shift.day} hours`} className="hours-input" type="text" inputMode="decimal" pattern="[0-9]*[.]?[0-9]*" placeholder="0.00" value={shift.hoursInput ?? (typeof shift.hours === 'number' ? String(shift.hours) : '')} onFocus={(event) => event.currentTarget.select()} onChange={(event) => updateActiveHours(index, event.target.value)} /><span className="earnings-cell">{money.format(hoursFor(shift) * data.wage)}</span></div>)}</div>
         <div className="tracker-footer"><span>Week total</span><strong>{activeHours.toFixed(2)} hrs</strong><strong>{money.format(activeHours * data.wage)}</strong></div>
         <div className="settings-row"><label>Goal start date<input type="date" value={data.targetStartDate} onChange={(event) => setData((current) => ({ ...current, targetStartDate: event.target.value }))} /></label><label>Goal end date<input type="date" value={data.targetDate} onChange={(event) => setData((current) => ({ ...current, targetDate: event.target.value }))} /></label><label>Week starts<select value={data.weekStartDay} onChange={(event) => updateSchedule('weekStartDay', event.target.value)}>{dayNames.map((day, index) => <option value={index} key={day}>{day}</option>)}</select></label><label>Reset time<input type="time" value={data.resetTime} onClick={(event) => event.currentTarget.showPicker?.()} onChange={(event) => updateSchedule('resetTime', event.target.value)} /></label><div className="reset-note"><span className="calendar-icon">R</span><span><strong>Weekly reset</strong><small>Archives on {dayNames[data.weekStartDay]} at {data.resetTime}</small></span></div></div>
         <div className="data-tools"><strong>Private browser data</strong><span>Stored only on this device.</span><button className="text-button" onClick={exportData}>Export backup</button><label className="text-button">Import backup<input className="file-input" type="file" accept="application/json" onChange={importData} /></label></div>
@@ -132,7 +157,7 @@ function App() {
       </section>}
 
       {addingWeek && <div className="modal-backdrop" onClick={() => setAddingWeek(false)}><div className="modal small-modal" onClick={(event) => event.stopPropagation()}><div className="section-title"><div><p className="eyebrow accent-text">HISTORICAL WEEK</p><h3>Add a past week</h3></div><button className="close-button" onClick={() => setAddingWeek(false)}>X</button></div><p className="muted modal-copy">Choose the start and end dates. The blank period will be added to your archive for editing.</p><div className="date-pair"><label className="modal-date-label">Week start<input type="date" value={newWeekStart} onChange={(event) => setNewWeekStart(event.target.value)} /></label><label className="modal-date-label">Week end<input type="date" min={newWeekStart} value={newWeekEnd} onChange={(event) => setNewWeekEnd(event.target.value)} /></label></div><div className="modal-actions"><button className="secondary-button" onClick={() => setAddingWeek(false)}>Cancel</button><button className="primary-button" disabled={!newWeekStart || !newWeekEnd || newWeekEnd < newWeekStart} onClick={addPastWeek}>Add week</button></div></div></div>}
-      {activeEditingWeek && <div className="modal-backdrop" onClick={() => setEditingWeek(null)}><div className="modal" onClick={(event) => event.stopPropagation()}><div className="section-title"><div><p className="eyebrow accent-text">HISTORICAL EDIT</p><h3>{activeEditingWeek.label}</h3></div><button className="close-button" onClick={() => setEditingWeek(null)}>X</button></div><div className="modal-shifts">{activeEditingWeek.shifts.map((shift, index) => <div className="modal-row" key={shift.date}><span>{shift.day}</span><input type="time" aria-label={`${shift.day} historical start time`} value={shift.start} onClick={(event) => event.currentTarget.showPicker?.()} onChange={(event) => updateArchivedShift(activeEditingWeek.id, index, 'start', event.target.value)} /><input type="time" aria-label={`${shift.day} historical end time`} value={shift.end} onClick={(event) => event.currentTarget.showPicker?.()} onChange={(event) => updateArchivedShift(activeEditingWeek.id, index, 'end', event.target.value)} /><input type="number" aria-label={`${shift.day} historical hours`} className="hours-input" min="0" max="24" step="0.25" placeholder="0.00" value={typeof shift.hours === 'number' ? shift.hours : hoursFor(shift) || ''} onFocus={(event) => event.currentTarget.select()} onChange={(event) => updateArchivedHours(activeEditingWeek.id, index, event.target.value)} /></div>)}</div><button className="primary-button full-button" onClick={() => setEditingWeek(null)}>Done editing</button></div></div>}
+      {activeEditingWeek && <div className="modal-backdrop" onClick={() => setEditingWeek(null)}><div className="modal" onClick={(event) => event.stopPropagation()}><div className="section-title"><div><p className="eyebrow accent-text">HISTORICAL EDIT</p><h3>{activeEditingWeek.label}</h3></div><button className="close-button" onClick={() => setEditingWeek(null)}>X</button></div><div className="modal-shifts">{activeEditingWeek.shifts.map((shift, index) => <div className="modal-row" key={shift.date}><span>{shift.day}</span><input type="text" inputMode="text" placeholder="9:00 AM" aria-label={`${shift.day} historical start time`} value={shift.start} onChange={(event) => updateArchivedShift(activeEditingWeek.id, index, 'start', event.target.value)} onBlur={(event) => updateArchivedShift(activeEditingWeek.id, index, 'start', formatTime(event.target.value))} /><input type="text" inputMode="text" placeholder="5:00 PM" aria-label={`${shift.day} historical end time`} value={shift.end} onChange={(event) => updateArchivedShift(activeEditingWeek.id, index, 'end', event.target.value)} onBlur={(event) => updateArchivedShift(activeEditingWeek.id, index, 'end', formatTime(event.target.value))} /><input type="text" inputMode="decimal" pattern="[0-9]*[.]?[0-9]*" aria-label={`${shift.day} historical hours`} className="hours-input" placeholder="0.00" value={shift.hoursInput ?? (typeof shift.hours === 'number' ? String(shift.hours) : '')} onFocus={(event) => event.currentTarget.select()} onChange={(event) => updateArchivedHours(activeEditingWeek.id, index, event.target.value)} /></div>)}</div><button className="primary-button full-button" onClick={() => setEditingWeek(null)}>Done editing</button></div></div>}
     </main>
   )
 }
