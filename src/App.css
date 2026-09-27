@@ -143,7 +143,7 @@
 .summary-strip > div, .table-row { border-color: rgba(255,255,255,.34); }
 .table-head { background: rgba(197, 216, 199, .28); }
 .tracker-footer { background: rgba(152, 168, 105, .2); }
-.table-row input, .settings-row input, .settings-row select, .summary-input, .modal-row input, .goal-input-label input { background: rgba(6, 6, 6, 0.55); box-shadow: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light); }
+.table-row input, .settings-row input, .settings-row select, .summary-input, .modal-row input, .goal-input-label input { background: rgba(235, 244, 236, .88); border: 1px solid rgba(33,75,58,.22); box-shadow: none; }
 .table-row input:focus, .settings-row input:focus, .settings-row select:focus, .summary-input:focus { box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light), 0 0 0 2px rgba(79,122,97,.35); }
 .earnings-cell, .countdown strong { color: var(--forest-soft); }
 .calendar-icon { background: #c5dac7; color: var(--forest); }
@@ -157,8 +157,11 @@
 .edit-button { background: rgba(33,75,58,.14); color: var(--forest); box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); }
 .avatar { box-shadow: 2px 3px 6px rgba(22,54,40,.28); }
 .settings-row label { color: var(--forest); }
-.settings-row input, .settings-row select { color: #edf4e5; }
-.settings-row input::placeholder { color: rgba(237,244,229,.7); }
+.table-row input, .settings-row input, .settings-row select, .summary-input, .modal-row input, .goal-input-label input { background: rgba(235, 244, 236, .88); color: var(--forest); }
+.table-row input::placeholder, .settings-row input::placeholder, .summary-input::placeholder, .modal-row input::placeholder, .goal-input-label input::placeholder { color: rgba(33,75,58,.58); }
+.settings-row input, .settings-row select { color: var(--forest); }
+.settings-row input::placeholder { color: rgba(33,75,58,.58); }
+.table-row input, .settings-row input, .settings-row select, .summary-input, .modal-row input, .goal-input-label input { background: #edf4e5; border: 1px solid rgba(33,75,58,.22); box-shadow: none; }
 .reset-note strong, .reset-note small { color: var(--forest); }
 .data-tools, .data-tools strong, .data-tools .text-button { color: var(--forest); }
 
