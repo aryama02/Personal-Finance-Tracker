@@ -5,6 +5,8 @@ type Shift = { day: string; date: string; start: string; end: string; hours?: nu
 type Week = { id: string; label: string; startDate: string; shifts: Shift[] }
 type TrackerData = { wage: number; targetStartDate: string; targetDate: string; weekStartDay: number; resetTime: string; activeWeek: Week; archivedWeeks: Week[] }
 
+const STORAGE_KEY = 'finance-tracker-data'
+
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -40,12 +42,21 @@ function hoursFor(shift: Shift) {
 function blankData(): TrackerData {
   return { wage: 0, targetStartDate: '', targetDate: '', weekStartDay: 5, resetTime: '00:00', activeWeek: makeWeek(getPeriodStart(), 5), archivedWeeks: [] }
 }
+
+function restoreData(stored: Partial<TrackerData>): TrackerData {
+  const defaults = blankData()
+  const data = { ...defaults, ...stored }
+  const activeWeek = stored.activeWeek?.id && Array.isArray(stored.activeWeek.shifts) ? stored.activeWeek : defaults.activeWeek
+  const archivedWeeks = Array.isArray(stored.archivedWeeks) ? stored.archivedWeeks : defaults.archivedWeeks
+  return { ...data, activeWeek, archivedWeeks }
+}
+
 function loadData() {
   try {
-    const saved = localStorage.getItem('finance-tracker-data')
+    const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       const stored = JSON.parse(saved) as Partial<TrackerData>
-      const data = { ...blankData(), ...stored }
+      const data = restoreData(stored)
       const currentPeriod = getPeriodStart(new Date(), data.weekStartDay, data.resetTime)
       if (data.activeWeek.id !== dateOnly(currentPeriod)) return { ...data, archivedWeeks: [data.activeWeek, ...data.archivedWeeks], activeWeek: makeWeek(currentPeriod, data.weekStartDay) }
       return data
@@ -62,7 +73,11 @@ function App() {
   const [newWeekStart, setNewWeekStart] = useState('')
   const [newWeekEnd, setNewWeekEnd] = useState('')
   const [currentTime] = useState(() => Date.now())
-  useEffect(() => { localStorage.setItem('finance-tracker-data', JSON.stringify(data)) }, [data])
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    } catch { /* keep the in-memory tracker usable if browser storage is unavailable */ }
+  }, [data])
 
   const allWeeks = useMemo(() => [data.activeWeek, ...data.archivedWeeks], [data])
   const totalHours = allWeeks.reduce((sum, week) => sum + week.shifts.reduce((weekSum, shift) => weekSum + hoursFor(shift), 0), 0)
@@ -93,7 +108,7 @@ function App() {
   const deleteArchivedWeek = (weekId: string) => setData((current) => ({ ...current, archivedWeeks: current.archivedWeeks.filter((week) => week.id !== weekId) }))
   const updateSchedule = (key: 'weekStartDay' | 'resetTime', value: string) => setData((current) => ({ ...current, [key]: key === 'weekStartDay' ? Number(value) : value }))
   const exportData = () => { const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })); const link = document.createElement('a'); link.href = url; link.download = 'finance-tracker-backup.json'; link.click(); URL.revokeObjectURL(url) }
-  const importData = (event: ChangeEvent<HTMLInputElement>) => { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const imported = JSON.parse(String(reader.result)) as Partial<TrackerData>; if (imported.activeWeek && Array.isArray(imported.archivedWeeks)) setData({ ...blankData(), ...imported }) } catch { /* ignore invalid backups */ } }; reader.readAsText(file); event.target.value = '' }
+  const importData = (event: ChangeEvent<HTMLInputElement>) => { const file = event.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const imported = JSON.parse(String(reader.result)) as Partial<TrackerData>; if (imported.activeWeek && Array.isArray(imported.archivedWeeks)) setData(restoreData(imported)) } catch { /* ignore invalid backups */ } }; reader.readAsText(file); event.target.value = '' }
   const activeEditingWeek = editingWeek ? allWeeks.find((week) => week.id === editingWeek) : null
 
   return (
