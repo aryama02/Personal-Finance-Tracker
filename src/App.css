@@ -168,3 +168,36 @@
 @media (max-width: 720px) {
 	.topbar::after { right: -65px; width: 220px; opacity: .3; }
 }
+
+.modal {
+	background: rgba(248, 245, 238, .96);
+	color: var(--forest);
+	display: flex;
+	flex-direction: column;
+	max-height: calc(100dvh - 32px);
+	overflow: hidden;
+}
+.modal-shifts {
+	min-height: 0;
+	overflow-y: auto;
+}
+.modal .full-button {
+	flex-shrink: 0;
+	margin-top: 16px;
+}
+
+@media (max-width: 560px) {
+	.modal {
+		width: min(100%, 430px);
+		padding: 18px;
+	}
+	.modal-row {
+		grid-template-columns: .7fr 1fr 1fr .75fr;
+		gap: 8px;
+		padding: 10px 0;
+	}
+	.modal-row input {
+		min-width: 0;
+		padding: 8px 7px;
+	}
+}
