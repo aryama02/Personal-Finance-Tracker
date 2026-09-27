@@ -153,7 +153,7 @@
 .goal-ring { box-shadow: 4px 4px 8px rgba(65,97,75,.15), -4px -4px 8px rgba(255,255,255,.48); }
 .goal-ring-center { background: var(--goal-center); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: inset 3px 3px 6px rgba(191, 255, 181, 0.14), inset -3px -3px 6px rgba(255,255,255,.24); }
 .modal { background: var(--sage); box-shadow: 12px 12px 24px var(--shadow-dark), -8px -8px 18px var(--shadow-light); }
-.close-button { background: var(--sage); box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); }
+.close-button { background: rgba(125, 76, 76, .1); color: #8b5e5e; box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); }
 .edit-button { background: rgba(33,75,58,.14); color: var(--forest); box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); }
 .avatar { box-shadow: 2px 3px 6px rgba(22,54,40,.28); }
 .settings-row label { color: var(--forest); }
