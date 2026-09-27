@@ -92,3 +92,71 @@
 	.goal-ring { width: 165px; height: 165px; }
 	.goal-ring-center strong { font-size: 21px; }
 }
+
+/* Sage glass and forest depth finish. */
+.app-shell {
+	--sage: #98A869;
+	--sage-deep: #7f914e;
+	--forest: #214b3a;
+	--forest-soft: #4f7a61;
+	--goal-center: #d7e4c4;
+	--glass: rgba(254, 254, 254, 0.62);
+	--glass-strong: rgba(235, 244, 236, .82);
+	--shadow-dark: rgba(65, 97, 75, .22);
+	--shadow-light: rgba(255, 255, 255, .24);
+	background: var(--sage);
+	background-image: radial-gradient(circle at 12% 8%, rgba(255,255,255,.5), transparent 32%), radial-gradient(circle at 90% 70%, rgba(142,179,148,.2), transparent 34%);
+}
+.topbar {
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	background: linear-gradient(115deg, #98A869 0%, #66834f 52%, #214b3a 100%);
+	border: 0;
+	box-shadow: 0 5px 10px var(--shadow-dark), 0 -1px 4px var(--shadow-light);
+}
+.topbar::after {
+	position: absolute;
+	z-index: -1;
+	top: -90px;
+	right: max(20px, calc((100vw - 1180px) / 2));
+	width: 310px;
+	height: 190px;
+	background: linear-gradient(90deg, rgba(152,168,105,.72), rgba(33,75,58,.08)), url('./assets/hero.png') center 43% / cover;
+	border-radius: 0 0 0 90px;
+	content: '';
+	opacity: .26;
+}
+.brand-mark { background: var(--forest); color: #dcebdc; box-shadow: inset 3px 3px 6px rgba(0,0,0,.22), inset -3px -3px 6px rgba(255,255,255,.16); }
+.topbar h1 { color: #f3f7ed; }
+.topbar .eyebrow, .topbar .saved-state { color: rgba(243,247,237,.78); }
+.page-heading h2, .section-title h3, .goal-panel h3, .summary-strip strong, .metric-card strong, .day-cell strong { color: var(--forest); }
+.eyebrow, .saved-state, .muted, .bar-value, .bar-label, .metric-foot, .summary-label { color: #55705d; }
+.accent-text, .text-button, .tab.active, .live-badge { color: var(--forest-soft); }
+.tabs { background: rgba(220, 233, 220, .55); border: 0; box-shadow: 0 5px 14px var(--shadow-dark); }
+.tab { color: #617968; }
+.tab.active { color: var(--forest); background: rgba(239, 247, 240, .4); box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
+	.secondary-button, .primary-button, .metric-card, .panel, .summary-strip, .shift-table { border: 1px solid rgba(255,255,255,.2); border-radius: 16px; box-shadow: 5px 5px 10px var(--shadow-dark), -3px -3px 6px var(--shadow-light); }
+.secondary-button, .panel, .metric-card, .summary-strip, .shift-table { background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.primary-button, .metric-card.featured { background: var(--forest); border-color: var(--forest); }
+.primary-button:hover, .secondary-button:hover { box-shadow: 5px 5px 12px var(--shadow-dark), -5px -5px 12px var(--shadow-light); }
+.summary-strip > div, .table-row { border-color: rgba(255,255,255,.34); }
+.table-head { background: rgba(197, 216, 199, .28); }
+.tracker-footer { background: rgba(152, 168, 105, .2); }
+.table-row input, .settings-row input, .settings-row select, .summary-input, .modal-row input, .goal-input-label input { background: rgba(221, 235, 223, .55); box-shadow: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light); }
+.table-row input:focus, .settings-row input:focus, .settings-row select:focus, .summary-input:focus { box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light), 0 0 0 2px rgba(79,122,97,.35); }
+.earnings-cell, .countdown strong { color: var(--forest-soft); }
+.calendar-icon { background: #c5dac7; color: var(--forest); }
+.progress-track { background: rgba(183, 207, 185, .45); box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light); }
+.progress-track div { background: #8da56d; }
+.metric-card.featured strong { color: #dcebdc; }
+.goal-ring { box-shadow: 4px 4px 8px rgba(65,97,75,.15), -4px -4px 8px rgba(255,255,255,.48); }
+.goal-ring-center { background: var(--goal-center); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: inset 3px 3px 6px rgba(191, 255, 181, 0.14), inset -3px -3px 6px rgba(255,255,255,.24); }
+.modal { background: var(--sage); box-shadow: 12px 12px 24px var(--shadow-dark), -8px -8px 18px var(--shadow-light); }
+.close-button { background: var(--sage); box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); }
+.edit-button { background: rgba(33,75,58,.14); color: var(--forest); box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); }
+.avatar { box-shadow: 2px 3px 6px rgba(22,54,40,.28); }
+
+@media (max-width: 720px) {
+	.topbar::after { right: -65px; width: 220px; opacity: .3; }
+}

@@ -154,7 +154,7 @@ function App() {
 
   return (
     <main className="app-shell">
-      <header className="topbar"><div className="brand-mark">FT</div><div><p className="eyebrow">PERSONAL FINANCE</p><h1>Finance &amp; Time</h1></div><div className="topbar-right"><span className="saved-state">Saved locally</span><div className="avatar">A</div></div></header>
+      <header className="topbar"><div className="brand-mark">FT</div><div><p className="eyebrow"></p><h1>Finance &amp; Time</h1></div><div className="topbar-right"><span className="saved-state">Saved locally</span><div className="avatar">A</div></div></header>
       <nav className="tabs" aria-label="Primary navigation"><button className={tab === 'dashboard' ? 'tab active' : 'tab'} onClick={() => setTab('dashboard')}>Dashboard</button><button className={tab === 'tracker' ? 'tab active' : 'tab'} onClick={() => setTab('tracker')}>Weekly HR Track</button></nav>
 
       {tab === 'tracker' ? <section className="page-content">
