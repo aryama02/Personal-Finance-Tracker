@@ -16,6 +16,7 @@ finance-tracker-backup*.json
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/tasks.json
 .idea
 .DS_Store
 *.suo
@@ -23,3 +24,9 @@ finance-tracker-backup*.json
 *.njsproj
 *.sln
 *.sw?
+
+# Environment and test output
+.env
+.env.*
+!.env.example
+coverage
