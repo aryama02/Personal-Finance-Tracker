@@ -156,6 +156,11 @@
 .close-button { background: var(--sage); box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); }
 .edit-button { background: rgba(33,75,58,.14); color: var(--forest); box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); }
 .avatar { box-shadow: 2px 3px 6px rgba(22,54,40,.28); }
+.settings-row label { color: var(--forest); }
+.settings-row input, .settings-row select { color: #edf4e5; }
+.settings-row input::placeholder { color: rgba(237,244,229,.7); }
+.reset-note strong, .reset-note small { color: var(--forest); }
+.data-tools, .data-tools strong, .data-tools .text-button { color: var(--forest); }
 
 @media (max-width: 720px) {
 	.topbar::after { right: -65px; width: 220px; opacity: .3; }
